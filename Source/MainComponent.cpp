@@ -35,6 +35,9 @@ public:
         tempoSlider.setValue(100.0);
         tempoSlider.setTextBoxIsEditable(false);
         tempoSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+        tempoSlider.setColour(Slider::thumbColourId, Colour::fromRGB(241, 230, 255));
+        tempoSlider.setColour(Slider::trackColourId, Colour::fromRGB(100, 100, 100));
+
         tempoSlider.addListener(this);
         
         addAndMakeVisible(modulationSlider);
@@ -42,6 +45,8 @@ public:
         modulationSlider.setValue(30.0);
         modulationSlider.setTextBoxIsEditable(false);
         modulationSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+        modulationSlider.setColour(Slider::thumbColourId, Colour::fromRGB(241, 230, 255));
+        modulationSlider.setColour(Slider::trackColourId, Colour::fromRGB(100, 100, 100));
         modulationSlider.addListener(this);
         
         addAndMakeVisible(gainSlider);
@@ -49,6 +54,8 @@ public:
         gainSlider.setValue(0.5);
         gainSlider.setTextBoxIsEditable(false);
         gainSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+        gainSlider.setColour(Slider::thumbColourId, Colour::fromRGB(241, 230, 255));
+        gainSlider.setColour(Slider::trackColourId, Colour::fromRGB(100, 100, 100));
         gainSlider.addListener(this);
         
         addAndMakeVisible(indexSlider);
@@ -56,10 +63,14 @@ public:
         indexSlider.setValue(10.0);
         indexSlider.setTextBoxIsEditable(false);
         indexSlider.setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+        indexSlider.setColour(Slider::thumbColourId, Colour::fromRGB(241, 230, 255));
+        indexSlider.setColour(Slider::trackColourId, Colour::fromRGB(100, 100, 100));
         indexSlider.addListener(this);
         
         
-        setSize (750, 400);
+        setSize (750, 650);
+        
+        setWantsKeyboardFocus(true);
 
         // specify the number of input and output channels that we want to open
         setAudioChannels (0, 2);
@@ -121,7 +132,13 @@ public:
     void paint (Graphics& g) override
     {
         // (Our component is opaque, so we must completely fill the background with a solid colour)
-        g.fillAll (Colour::fromRGB(40, 40 ,40));
+        g.fillAll (Colour::fromRGB(80, 80, 80));
+        
+        Rectangle<int> area (getLocalBounds());
+        
+        g.setColour(Colour::fromRGB(40, 40, 40));
+        g.fillRect(area.removeFromTop(90));
+        g.fillRect(area.removeFromBottom(335));
         
         addAndMakeVisible(sequencer);
         
@@ -131,8 +148,24 @@ public:
             node[i].setSequencer(&sequencer);
         }
         
-        g.setColour(Colour::fromRGB(193, 199, 218));
-        g.drawLine(10, 95, getWidth()-10, 95, 3);
+        g.setGradientFill (ColourGradient (Colour::fromRGB(241, 230, 255), 0, 0,
+                                           Colour::fromRGB(170, 121, 57), 150, 100, false));
+
+        
+        g.setFont(Font("Avenir", 80.0f, Font::italic));
+        g.drawText("Orbs", 10, 10, getWidth()/2, 80, true);
+        
+        g.setFont(Font("Avenir", 30.0f, Font::plain));
+        g.setColour(Colour::fromRGB(170, 121, 57));
+        
+        g.drawText("Graham Davis", getWidth()/2, 25, getWidth()/2-20, 80, Justification::right);
+        
+        g.setFont(Font("Avenir", 20.0f, Font::bold));
+        g.drawText("Rate", 15, 120, getWidth()/2, 20, true);
+        g.drawText("Gain", 15, 210, getWidth()/2, 20, true);
+        
+        g.drawText("Modulator Frequency", (getWidth()/2) + 15, 120, getWidth()/2, 20, true);
+        g.drawText("Modulator Index", (getWidth()/2) + 15, 210, getWidth()/2, 20, true);
     }
 
     void resized() override
@@ -145,12 +178,14 @@ public:
             for(int i=0; i<8; i++) {
                 node[i].setBounds(nodeArea.removeFromLeft(getWidth()/8));
             }
+            Rectangle<int> titleArea = area.removeFromTop(80);
             
-            Rectangle<int> controlArea = area.removeFromTop(100);
-            Rectangle<int> topControlArea = controlArea.removeFromTop(50);
-            tempoSlider.setBounds(topControlArea.removeFromLeft(getWidth()/2));
-            modulationSlider.setBounds(topControlArea.removeFromRight(getWidth()/2));
-            Rectangle<int> bottomControlArea = controlArea.removeFromBottom(50);
+            Rectangle<int> controlArea = area.removeFromTop(200).withTrimmedLeft(10).withTrimmedRight(10);
+            Rectangle<int> topControlArea = controlArea.removeFromTop(120);
+            tempoSlider.setBounds(topControlArea.removeFromLeft(getWidth()/2).withTrimmedTop(35));
+            modulationSlider.setBounds(topControlArea.removeFromRight(getWidth()/2).withTrimmedTop(35));
+            
+            Rectangle<int> bottomControlArea = controlArea.removeFromBottom(70);
             gainSlider.setBounds(bottomControlArea.removeFromLeft(getWidth()/2));
             indexSlider.setBounds(bottomControlArea.removeFromRight(getWidth()/2));
 
@@ -178,6 +213,25 @@ public:
             node[i].checkNote();
         }
     }
+    
+    bool keyStateChanged(bool isKeyDown) override
+    {
+        if (isKeyDown) {
+            if (KeyPress::isKeyCurrentlyDown(KeyPress::spaceKey)) {
+                for(int i=0; i<8; i++) {
+                    node[i].flip();
+                }
+            } else {
+                for(int i=0; i<8; i++) {
+                    if (KeyPress::isKeyCurrentlyDown(i+49)) {
+                        node[i].flip();
+                        break;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
 
 private:
@@ -189,6 +243,8 @@ private:
     
     FaustReverb reverb;
     MapUI reverbControl;
+    
+    KeyPress key;
     
     int onOff;
     double rate;

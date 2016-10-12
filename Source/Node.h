@@ -31,17 +31,20 @@ public:
             currentSequencer->setNodeFrequency(nodeNumber, 1250-newY*5);
         }
         
-        g.setColour (Colour::fromRGB(193, 199, 218));
+        g.setColour(Colour::fromRGB(100, 100, 100));
+        g.drawRoundedRectangle(getWidth()/2-5, 10, 10, newY, 10, 2);
+        
+        g.setGradientFill (ColourGradient (Colour::fromRGB(241, 230, 255), 0, 0,
+                                           Colour::fromRGB(170, 121, 57), 0, 300, false));
         if (currentNode) {
-            g.fillRoundedRectangle(getWidth()/2-5, newY+30, 10, getHeight()-newY, 10);
+            g.fillRoundedRectangle(getWidth()/2-5, newY+30, 10, getHeight()-35-newY, 10);
         } else {
-            g.drawRoundedRectangle(getWidth()/2-5, newY+30, 10, getHeight()-newY, 10, 2);
+            g.drawRoundedRectangle(getWidth()/2-5, newY+30, 10, getHeight()-35-newY, 10, 2);
         }
 
         g.drawEllipse (getWidth()/2-30, newY, 60, 60, 3);
         
         if(onOff==1) {
-            g.setColour(Colour::fromRGB(117, 129, 168));
             g.fillEllipse(getWidth()/2-30, newY, 60, 60);
         } else {
             g.setColour(Colours::darkgrey);
@@ -93,6 +96,12 @@ public:
         } else {
             currentNode = 0.0;
         }
+        repaint();
+    }
+    
+    void flip(){
+        onOff = !onOff;
+        currentSequencer->toggleNote(nodeNumber);
         repaint();
     }
     

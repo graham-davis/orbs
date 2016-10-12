@@ -10,3 +10,5 @@ FM tones are controlled by sliders.
 
 Possible future improvements include controlling the volume and FM parameters of each voice indivually,
 preset arpeggiated sequences, and reversing direction of the sequencer.
+
+[Watch the demo!](https://youtu.be/SqjtA54WwDE)

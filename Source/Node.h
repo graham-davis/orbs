@@ -28,6 +28,7 @@ public:
             newY = yPos+dragY;
             if (newY < 5) newY = 5;
             if (newY > 210) newY = 210;
+            std::cout << 1250-newY*5 << std::endl;
             currentSequencer->setNodeFrequency(nodeNumber, 1250-newY*5);
         }
         

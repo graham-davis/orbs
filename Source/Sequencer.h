@@ -62,7 +62,7 @@ public:
     void prepareToPlay() {
         for(int i=0; i<8; i++) {
             noteOn[i] = 0;
-            frequencies[i] = 100;
+            frequencies[i] = 200;
         }
     }
     
